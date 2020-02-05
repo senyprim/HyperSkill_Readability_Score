@@ -1,20 +1,28 @@
 package readability;
+import readability.index.AgeIndex;
+import readability.index.Index;
+
 import  java.util.*;
+
 public class Main {
     public static void main(String[] args) {
         Scanner scanner=new Scanner(System.in);
-        String text= scanner.nextLine();
-        String[] sentences= text.split("\\.|\\?|!");
-        int countWords=0;
-        for(String sectence : sentences){
-            List<String> words=new ArrayList<>();
-            for(String word:sectence.trim().split("\\s+|,")){
-                if (!word.trim().equals("")) words.add(word);
-            }
-            countWords+=words.size();
+
+        Text text=Text.loadFromFile(args[0]);
+        if (text==null) throw new NullPointerException();
+        System.out.print(text.parameterText.toString());
+        System.out.print("Enter the score you want to calculate (ARI, FK, SMOG, CL, all):");
+        String answer=scanner.nextLine();
+
+        System.out.println();
+        List<Index> indexes =text.getIndex(answer);
+        for(Index index : indexes==null?new ArrayList<Index>():indexes){
+            System.out.println(String.format("%s %s",index.toString()
+                    , AgeIndex.getAgeIndex(index.getIndex()).toString()));
         }
-        double average=(double) countWords/sentences.length;
-        String answer = average>10?"HARD":"EASY";
-        System.out.print(answer);
+
+        System.out.println();
+        System.out.println(String.format("This text should be understood in average by %.2f year olds.",text.getAverageAge()));
+
     }
 }
